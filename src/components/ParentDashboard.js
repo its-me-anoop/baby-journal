@@ -1,6 +1,7 @@
 // src/components/ParentDashboard.js
 import React, { useState, useEffect } from 'react';
 import { firestore } from '../firebase';
+import { collection, getDocs } from 'firebase/firestore';
 import JournalEntryCard from './JournalEntryCard';
 import JournalEntryForm from './JournalEntryForm';
 
@@ -9,8 +10,9 @@ const ParentDashboard = () => {
 
     useEffect(() => {
         const fetchEntries = async () => {
-            const entriesCollection = await firestore.collection('journalEntries').get();
-            setEntries(entriesCollection.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            const entriesCollection = collection(firestore, 'journalEntries');
+            const entriesSnapshot = await getDocs(entriesCollection);
+            setEntries(entriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         };
         fetchEntries();
     }, []);

@@ -1,8 +1,9 @@
 // src/pages/RegisterPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -12,8 +13,39 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            navigate('/admin'); // Navigate to admin dashboard
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Check if the user is associated with an existing family
+            const familyCollection = collection(firestore, 'families');
+            const q = query(familyCollection, where('members', 'array-contains', email));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                // User is not associated with any family, make them an admin
+                const familyDoc = await addDoc(familyCollection, {
+                    admin: user.uid,
+                    members: [email],
+                });
+
+                // Update the user profile with the family ID
+                await updateDoc(doc(firestore, 'users', user.uid), {
+                    familyId: familyDoc.id,
+                    role: 'admin',
+                });
+
+                navigate('/admin');
+            } else {
+                // User is already associated with a family
+                // Update the user profile with the family ID and role
+                const familyId = querySnapshot.docs[0].id;
+                await updateDoc(doc(firestore, 'users', user.uid), {
+                    familyId: familyId,
+                    role: 'member',
+                });
+
+                navigate('/parent');
+            }
         } catch (error) {
             console.error("Error registering with email and password", error);
         }
