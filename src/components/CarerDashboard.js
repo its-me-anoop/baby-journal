@@ -8,7 +8,10 @@ const CarerDashboard = () => {
 
     useEffect(() => {
         const fetchEntries = async () => {
-            const entriesCollection = await firestore.collection('journalEntries').get();
+            // Fetch only the entries related to the children assigned to this carer
+            const assignedChildren = ['childId1', 'childId2']; // Replace with actual logic
+            const entriesCollection = await firestore.collection('journalEntries')
+                .where('childId', 'in', assignedChildren).get();
             setEntries(entriesCollection.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         };
         fetchEntries();
