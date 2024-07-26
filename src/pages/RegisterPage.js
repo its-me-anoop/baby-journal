@@ -1,18 +1,18 @@
 // src/pages/RegisterPage.js
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Update this line
 import { auth } from '../firebase';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate(); // Update this line
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await auth.createUserWithEmailAndPassword(email, password);
-            history.push('/admin');
+            navigate('/admin'); // Update this line
         } catch (error) {
             console.error("Error registering with email and password", error);
         }
