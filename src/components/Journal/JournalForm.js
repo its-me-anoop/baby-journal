@@ -4,7 +4,7 @@ import { db, auth } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
-import { Baby, Moon, Utensils, Diaper, Activity, Clock, Droplet, Milk } from 'lucide-react';
+import { Baby, Moon, Utensils, Activity, Clock, Droplet, Milk, DropletIcon } from 'lucide-react';
 
 const JournalForm = ({ onEntryAdded }) => {
     const [entryType, setEntryType] = useState('sleep');
@@ -46,20 +46,20 @@ const JournalForm = ({ onEntryAdded }) => {
     };
 
     const entryTypeIcons = {
-        sleep: <Moon className="w-5 h-5 mr-2" />,
-        feeding: <Utensils className="w-5 h-5 mr-2" />,
-        diaper: <Diaper className="w-5 h-5 mr-2" />,
-        activity: <Activity className="w-5 h-5 mr-2" />
+        sleep: <Moon className="w-5 h-5 mr-2 text-indigo-400" />,
+        feeding: <Utensils className="w-5 h-5 mr-2 text-green-400" />,
+        diaper: <DropletIcon className="w-5 h-5 mr-2 text-yellow-400" />,
+        activity: <Activity className="w-5 h-5 mr-2 text-purple-400" />
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 bg-blue-50 p-6 rounded-lg shadow-md">
-            <div className="flex items-center bg-white p-2 rounded">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md">
+            <div className="flex items-center bg-gray-50 p-2 rounded">
                 <Baby className="w-5 h-5 mr-2 text-blue-400" />
                 <select
                     value={selectedChild}
                     onChange={(e) => setSelectedChild(e.target.value)}
-                    className="w-full p-2 border-none focus:ring-0"
+                    className="w-full p-2 bg-transparent border-none focus:ring-0"
                     required
                 >
                     <option value="">Select a child</option>
@@ -69,12 +69,12 @@ const JournalForm = ({ onEntryAdded }) => {
                 </select>
             </div>
 
-            <div className="flex items-center bg-white p-2 rounded">
+            <div className="flex items-center bg-gray-50 p-2 rounded">
                 {entryTypeIcons[entryType]}
                 <select
                     value={entryType}
                     onChange={(e) => setEntryType(e.target.value)}
-                    className="w-full p-2 border-none focus:ring-0"
+                    className="w-full p-2 bg-transparent border-none focus:ring-0"
                 >
                     <option value="sleep">Sleep</option>
                     <option value="feeding">Feeding</option>
@@ -149,9 +149,51 @@ const JournalForm = ({ onEntryAdded }) => {
                 </div>
             )}
 
-            {/* Similar updates for diaper and activity types */}
+            {entryType === 'diaper' && (
+                <>
+                    <Input
+                        type="datetime-local"
+                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                        required
+                    />
+                    <select
+                        onChange={(e) => setFormData({ ...formData, diaperType: e.target.value })}
+                        className="w-full p-2 border rounded"
+                        required
+                    >
+                        <option value="">Select diaper type</option>
+                        <option value="wet">Wet</option>
+                        <option value="dirty">Dirty</option>
+                        <option value="both">Both</option>
+                    </select>
+                </>
+            )}
 
-            <Button type="submit" className="w-full bg-green-400 hover:bg-green-500 text-white">Add Entry</Button>
+            {entryType === 'activity' && (
+                <>
+                    <Input
+                        type="datetime-local"
+                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                        required
+                    />
+                    <Input
+                        type="text"
+                        placeholder="Activity Type"
+                        onChange={(e) => setFormData({ ...formData, activityType: e.target.value })}
+                        required
+                    />
+                    <Input
+                        type="number"
+                        placeholder="Duration (minutes)"
+                        onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                        required
+                    />
+                </>
+            )}
+
+            <Button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600 text-white transition duration-300 ease-in-out transform hover:scale-105">
+                Add Entry
+            </Button>
         </form>
     );
 };

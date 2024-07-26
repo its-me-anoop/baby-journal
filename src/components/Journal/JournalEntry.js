@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import Card, { CardHeader, CardContent, CardFooter } from '../../components/UI/Card';
+import { Baby, Moon, Utensils, Activity, Clock, User, DropletIcon } from 'lucide-react';
 
 const JournalEntry = ({ entry }) => {
     const [childName, setChildName] = useState('');
@@ -19,7 +20,7 @@ const JournalEntry = ({ entry }) => {
 
     const getEntryTypeColor = (type) => {
         const colors = {
-            sleep: 'bg-blue-100 text-blue-800',
+            sleep: 'bg-indigo-100 text-indigo-800',
             feeding: 'bg-green-100 text-green-800',
             diaper: 'bg-yellow-100 text-yellow-800',
             activity: 'bg-purple-100 text-purple-800'
@@ -31,46 +32,61 @@ const JournalEntry = ({ entry }) => {
         return type === 'breast_milk' ? 'Breast Milk' : 'Formula';
     };
 
+    const entryTypeIcons = {
+        sleep: <Moon className="w-5 h-5 text-indigo-500" />,
+        feeding: <Utensils className="w-5 h-5 text-green-500" />,
+        diaper: <DropletIcon className="w-5 h-5 text-yellow-500" />,
+        activity: <Activity className="w-5 h-5 text-purple-500" />
+    };
+
     return (
-        <Card className="mb-4">
-            <CardHeader className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold capitalize">{entry.type}</h3>
-                <span className={`px-2 py-1 rounded ${getEntryTypeColor(entry.type)}`}>{entry.type}</span>
+        <Card className="mb-4 bg-white shadow-md rounded-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105">
+            <CardHeader className={`flex justify-between items-center p-4 ${getEntryTypeColor(entry.type)}`}>
+                <div className="flex items-center">
+                    {entryTypeIcons[entry.type]}
+                    <h3 className="text-lg font-semibold capitalize ml-2">{entry.type}</h3>
+                </div>
             </CardHeader>
-            <CardContent>
-                <p className="font-bold mb-2">Child: {childName}</p>
+            <CardContent className="p-4">
+                <p className="font-bold mb-2 flex items-center">
+                    <Baby className="w-5 h-5 mr-2 text-blue-500" />
+                    {childName}
+                </p>
                 {entry.type === 'sleep' && (
-                    <>
-                        <p>Start: {format(new Date(entry.startTime), 'PPpp')}</p>
-                        <p>End: {format(new Date(entry.endTime), 'PPpp')}</p>
-                        <p>Duration: {((new Date(entry.endTime) - new Date(entry.startTime)) / (1000 * 60 * 60)).toFixed(2)} hours</p>
-                    </>
+                    <div className="space-y-1">
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Start: {format(new Date(entry.startTime), 'PPpp')}</p>
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />End: {format(new Date(entry.endTime), 'PPpp')}</p>
+                        <p className="flex items-center"><Moon className="w-4 h-4 mr-2" />Duration: {((new Date(entry.endTime) - new Date(entry.startTime)) / (1000 * 60 * 60)).toFixed(2)} hours</p>
+                    </div>
                 )}
                 {entry.type === 'feeding' && (
-                    <>
-                        <p>Time: {format(new Date(entry.time), 'PPpp')}</p>
-                        <p>Type: {formatFeedingType(entry.feedingType)}</p>
+                    <div className="space-y-1">
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Time: {format(new Date(entry.time), 'PPpp')}</p>
+                        <p className="flex items-center"><Utensils className="w-4 h-4 mr-2" />Type: {formatFeedingType(entry.feedingType)}</p>
                         {entry.quantity && entry.unit && (
-                            <p>Amount: {entry.quantity} {entry.unit}</p>
+                            <p className="flex items-center"><Utensils className="w-4 h-4 mr-2" />Amount: {entry.quantity} {entry.unit}</p>
                         )}
-                    </>
+                    </div>
                 )}
                 {entry.type === 'diaper' && (
-                    <>
-                        <p>Time: {format(new Date(entry.time), 'PPpp')}</p>
-                        <p>Type: {entry.diaperType}</p>
-                    </>
+                    <div className="space-y-1">
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Time: {format(new Date(entry.time), 'PPpp')}</p>
+                        <p className="flex items-center"><DropletIcon className="w-4 h-4 mr-2" />Type: {entry.diaperType}</p>
+                    </div>
                 )}
                 {entry.type === 'activity' && (
-                    <>
-                        <p>Time: {format(new Date(entry.time), 'PPpp')}</p>
-                        <p>Activity: {entry.activityType}</p>
-                        <p>Duration: {entry.duration} minutes</p>
-                    </>
+                    <div className="space-y-1">
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Time: {format(new Date(entry.time), 'PPpp')}</p>
+                        <p className="flex items-center"><Activity className="w-4 h-4 mr-2" />Activity: {entry.activityType}</p>
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Duration: {entry.duration} minutes</p>
+                    </div>
                 )}
             </CardContent>
-            <CardFooter className="text-sm text-gray-500">
-                Created by: {entry.createdBy}
+            <CardFooter className="text-sm text-gray-500 bg-gray-50 p-4">
+                <p className="flex items-center">
+                    <User className="w-4 h-4 mr-2 text-gray-400" />
+                    Created by: {entry.createdBy}
+                </p>
             </CardFooter>
         </Card>
     );
