@@ -1,6 +1,6 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -14,15 +14,15 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Switch>
-          <Route path="/" exact component={HomePage} />
-          <Route path="/login" component={LoginPage} />
-          <Route path="/register" component={RegisterPage} />
-          <Route path="/admin" component={AdminPage} />
-          <Route path="/parent" component={ParentPage} />
-          <Route path="/carer" component={CarerPage} />
-          <Route path="/family" component={FamilyPage} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/parent" element={<ParentPage />} />
+          <Route path="/carer" element={<CarerPage />} />
+          <Route path="/family" element={<FamilyPage />} />
+        </Routes>
       </Router>
     </AuthProvider>
   );
