@@ -1,6 +1,7 @@
 // src/components/Family.js
 import React, { useState, useEffect } from 'react';
 import { firestore } from '../firebase';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
 
 const Family = () => {
     const [family, setFamily] = useState([]);
@@ -8,15 +9,17 @@ const Family = () => {
 
     useEffect(() => {
         const fetchFamily = async () => {
-            const familyCollection = await firestore.collection('family').get();
-            setFamily(familyCollection.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            const familyCollection = collection(firestore, 'family');
+            const familySnapshot = await getDocs(familyCollection);
+            setFamily(familySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         };
         fetchFamily();
     }, []);
 
     const addFamilyMember = async () => {
         if (newFamilyMember) {
-            const docRef = await firestore.collection('family').add({ name: newFamilyMember });
+            const familyCollection = collection(firestore, 'family');
+            const docRef = await addDoc(familyCollection, { name: newFamilyMember });
             setFamily([...family, { id: docRef.id, name: newFamilyMember }]);
             setNewFamilyMember('');
         }
