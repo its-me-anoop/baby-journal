@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import Card, { CardHeader, CardContent, CardFooter } from '../../components/UI/Card';
-import { Baby, Moon, Utensils, Activity, Clock, User, DropletIcon } from 'lucide-react';
+import { Baby, Moon, Utensils, Activity, Clock, User, DropletIcon, Camera, Ruler } from 'lucide-react';
 
 const JournalEntry = ({ entry }) => {
     const [childName, setChildName] = useState('');
@@ -23,7 +23,8 @@ const JournalEntry = ({ entry }) => {
             sleep: 'bg-indigo-100 text-indigo-800',
             feeding: 'bg-green-100 text-green-800',
             diaper: 'bg-yellow-100 text-yellow-800',
-            activity: 'bg-purple-100 text-purple-800'
+            activity: 'bg-purple-100 text-purple-800',
+            growth: 'bg-pink-100 text-pink-800'
         };
         return colors[type] || 'bg-gray-100 text-gray-800';
     };
@@ -36,7 +37,8 @@ const JournalEntry = ({ entry }) => {
         sleep: <Moon className="w-5 h-5 text-indigo-500" />,
         feeding: <Utensils className="w-5 h-5 text-green-500" />,
         diaper: <DropletIcon className="w-5 h-5 text-yellow-500" />,
-        activity: <Activity className="w-5 h-5 text-purple-500" />
+        activity: <Activity className="w-5 h-5 text-purple-500" />,
+        growth: <Ruler className="w-5 h-5 text-pink-500" />
     };
 
     return (
@@ -79,6 +81,21 @@ const JournalEntry = ({ entry }) => {
                         <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Time: {format(new Date(entry.time), 'PPpp')}</p>
                         <p className="flex items-center"><Activity className="w-4 h-4 mr-2" />Activity: {entry.activityType}</p>
                         <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Duration: {entry.duration} minutes</p>
+                        {entry.notes && <p className="flex items-center"><Activity className="w-4 h-4 mr-2" />Notes: {entry.notes}</p>}
+                        {entry.photoUrl && (
+                            <div className="mt-2">
+                                <p className="flex items-center mb-1"><Camera className="w-4 h-4 mr-2" />Photo:</p>
+                                <img src={entry.photoUrl} alt="Activity" className="w-full rounded-lg" />
+                            </div>
+                        )}
+                    </div>
+                )}
+                {entry.type === 'growth' && (
+                    <div className="space-y-1">
+                        <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />Date: {format(new Date(entry.measurementDate), 'PPpp')}</p>
+                        {entry.weight && <p className="flex items-center"><Ruler className="w-4 h-4 mr-2" />Weight: {entry.weight} kg</p>}
+                        {entry.height && <p className="flex items-center"><Ruler className="w-4 h-4 mr-2" />Height: {entry.height} cm</p>}
+                        {entry.headCircumference && <p className="flex items-center"><Ruler className="w-4 h-4 mr-2" />Head Circumference: {entry.headCircumference} cm</p>}
                     </div>
                 )}
             </CardContent>
