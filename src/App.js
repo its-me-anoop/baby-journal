@@ -7,12 +7,12 @@ import { useAuth } from './hooks/useAuth';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import SignUpPage from './pages/SignUpPage';
 import JournalPage from './pages/JournalPage';
+import FamilyPage from './pages/FamilyPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
-import FamilyPage from './pages/FamilyPage';
+import Login from './components/Auth/Login';
+import SignUp from './components/Auth/SignUp';
 
 // PrivateRoute component
 const PrivateRoute = ({ children }) => {
@@ -53,8 +53,8 @@ function App() {
           <main className="flex-grow container mx-auto px-4 py-8">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route
                 path="/journal"
                 element={

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../services/firebase';
 import { startOfDay, endOfDay } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 

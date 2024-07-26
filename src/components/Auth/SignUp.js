@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { auth, db } from '../../services/firebase';
+import Button from '../../components/UI/Button';
+import Input from '../../components/UI/Input';
 
 const SignUp = () => {
     const [email, setEmail] = useState('');

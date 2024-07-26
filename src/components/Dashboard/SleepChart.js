@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../services/firebase';
 import { startOfWeek, endOfWeek, format, eachDayOfInterval } from 'date-fns';
 
 const SleepChart = () => {

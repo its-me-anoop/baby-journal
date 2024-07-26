@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import Card, { CardHeader, CardContent } from '@/components/UI/Card';
-import Button from '@/components/UI/Button';
+import Card, { CardHeader, CardContent } from '../components/UI/Card';
+import Button from '../components/UI/Button';
 
 const HomePage = () => {
     const { user } = useAuth();

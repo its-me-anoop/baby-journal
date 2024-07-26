@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import Card, { CardHeader, CardContent } from '@/components/UI/Card';
-import Button from '@/components/UI/Button';
-import JournalEntry from '@/components/Journal/JournalEntry';
-import JournalForm from '@/components/Journal/JournalForm';
+import Card, { CardHeader, CardContent } from '../components/UI/Card';
+import Button from '../components/UI/Button';
+import JournalEntry from '../components/Journal/JournalEntry';
+import JournalForm from '../components/Journal/JournalForm';
 
 const JournalPage = () => {
     const [entries, setEntries] = useState([]);

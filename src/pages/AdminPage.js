@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import Card, { CardHeader, CardContent } from '@/components/UI/Card';
-import Button from '@/components/UI/Button';
-import Input from '@/components/UI/Input';
+import Card, { CardHeader, CardContent } from '../components/UI/Card';
+import Button from '../components/UI/Button';
+import Input from '../components/UI/Input';
 
 const AdminPage = () => {
     const [users, setUsers] = useState([]);

@@ -1,6 +1,6 @@
 import React from 'react';
-import FamilyManager from './FamilyManager';
-import ChildManager from './ChildManager';
+import FamilyManager from '../components/Family/FamilyManager';
+import ChildManager from '../components/Family/ChildManager';
 
 const FamilyPage = () => {
     return (

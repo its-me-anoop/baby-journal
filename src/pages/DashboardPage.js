@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, format } from 'date-fns';
-import Card, { CardHeader, CardContent } from '@/components/UI/Card';
+import Card, { CardHeader, CardContent } from '../components/UI/Card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const DashboardPage = () => {

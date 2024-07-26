@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../services/firebase';
+import Card, { CardHeader, CardContent, CardFooter } from '../../components/UI/Card';
 
 const JournalEntry = ({ entry }) => {
+    const [childName, setChildName] = useState('');
+
+    useEffect(() => {
+        const fetchChildName = async () => {
+            const childDoc = await getDoc(doc(db, 'children', entry.childId));
+            if (childDoc.exists()) {
+                setChildName(childDoc.data().name);
+            }
+        };
+        fetchChildName();
+    }, [entry.childId]);
+
     const getEntryTypeColor = (type) => {
         const colors = {
             sleep: 'bg-blue-100 text-blue-800',
@@ -14,13 +27,18 @@ const JournalEntry = ({ entry }) => {
         return colors[type] || 'bg-gray-100 text-gray-800';
     };
 
+    const formatFeedingType = (type) => {
+        return type === 'breast_milk' ? 'Breast Milk' : 'Formula';
+    };
+
     return (
         <Card className="mb-4">
             <CardHeader className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold capitalize">{entry.type}</h3>
-                <Badge className={getEntryTypeColor(entry.type)}>{entry.type}</Badge>
+                <span className={`px-2 py-1 rounded ${getEntryTypeColor(entry.type)}`}>{entry.type}</span>
             </CardHeader>
             <CardContent>
+                <p className="font-bold mb-2">Child: {childName}</p>
                 {entry.type === 'sleep' && (
                     <>
                         <p>Start: {format(new Date(entry.startTime), 'PPpp')}</p>
@@ -31,7 +49,10 @@ const JournalEntry = ({ entry }) => {
                 {entry.type === 'feeding' && (
                     <>
                         <p>Time: {format(new Date(entry.time), 'PPpp')}</p>
-                        <p>Amount: {entry.amount}</p>
+                        <p>Type: {formatFeedingType(entry.feedingType)}</p>
+                        {entry.quantity && entry.unit && (
+                            <p>Amount: {entry.quantity} {entry.unit}</p>
+                        )}
                     </>
                 )}
                 {entry.type === 'diaper' && (

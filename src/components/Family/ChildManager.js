@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db, auth } from '../../firebase';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { db, auth } from '../../services/firebase';
+import Button from '../../components/UI/Button';
+import Input from '../../components/UI/Input';
+import Card, { CardHeader, CardContent } from '../../components/UI/Card';
 
 const ChildManager = () => {
     const [children, setChildren] = useState([]);

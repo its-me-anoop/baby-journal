@@ -6,7 +6,7 @@ import {
     signOut as firebaseSignOut
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db } from '../services/firebase';
 
 const AuthContext = createContext();
 
@@ -72,3 +72,5 @@ export const AuthProvider = ({ children }) => {
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthContext;

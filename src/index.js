@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './styles/index.css';
 import App from './App';
-import './firebase'; // This initializes Firebase
+import './services/firebase'; // This initializes Firebase
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../services/firebase';
 
 export const useFirestore = (collectionName) => {
     const [documents, setDocuments] = useState([]);
