@@ -1,19 +1,32 @@
 // src/context/AuthContext.js
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../firebase';
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
+
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
 
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
-        auth.onAuthStateChanged(setCurrentUser);
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            setCurrentUser(user);
+        });
+
+        return unsubscribe;
     }, []);
 
-    return (
-        <AuthContext.Provider value={{ currentUser }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    const logout = () => {
+        return auth.signOut();
+    };
+
+    const value = {
+        currentUser,
+        logout
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

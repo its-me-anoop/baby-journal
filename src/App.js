@@ -9,11 +9,13 @@ import ParentPage from './pages/ParentPage';
 import CarerPage from './pages/CarerPage';
 import FamilyPage from './pages/FamilyPage';
 import { AuthProvider } from './context/AuthContext';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
