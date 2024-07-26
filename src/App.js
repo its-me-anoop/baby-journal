@@ -10,6 +10,8 @@ import CarerPage from './pages/CarerPage';
 import FamilyPage from './pages/FamilyPage';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import CreateFamily from './components/CreateFamily';
+import InviteMembers from './components/InviteMembers';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
           <Route path="/parent" element={<ParentPage />} />
           <Route path="/carer" element={<CarerPage />} />
           <Route path="/family" element={<FamilyPage />} />
+          <Route path="/create-family" element={<CreateFamily />} />
+          <Route path="/invite-members" element={<InviteMembers />} />
         </Routes>
       </Router>
     </AuthProvider>
