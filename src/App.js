@@ -1,43 +1,60 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
 
-// Import pages
+// Importing components
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
 import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
 import JournalPage from './pages/JournalPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
-
-// Import components
-import Login from './components/Auth/Login';
-import SignUp from './components/Auth/SignUp';
-import Header from './components/Layout/Header';
-import Footer from './components/Layout/Footer';
+import FamilyPage from './pages/FamilyPage';
 
 // PrivateRoute component
 const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 };
 
 // AdminRoute component
 const AdminRoute = ({ children }) => {
-  const { user, isAdmin } = useAuth();
-  return user && isAdmin ? children : <Navigate to="/" replace />;
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user || !isAdmin) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
 };
 
-const App = () => {
+function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-grow container mx-auto px-4 py-8">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
               <Route
                 path="/journal"
                 element={
@@ -55,6 +72,14 @@ const App = () => {
                 }
               />
               <Route
+                path="/family"
+                element={
+                  <PrivateRoute>
+                    <FamilyPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/admin"
                 element={
                   <AdminRoute>
@@ -66,9 +91,9 @@ const App = () => {
           </main>
           <Footer />
         </div>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
-};
+}
 
 export default App;
