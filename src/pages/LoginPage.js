@@ -1,18 +1,19 @@
 // src/pages/LoginPage.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Update this line
+import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate(); // Update this line
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await auth.signInWithEmailAndPassword(email, password);
-            navigate('/admin'); // Update this line
+            await signInWithEmailAndPassword(auth, email, password);
+            navigate('/admin'); // Navigate to admin dashboard
         } catch (error) {
             console.error("Error logging in with password and email", error);
         }
