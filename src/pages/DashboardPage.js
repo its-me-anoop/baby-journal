@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db, auth } from '../services/firebase';
+import { db } from '../services/firebase';
+import { useAuth } from '../hooks/useAuth';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import SleepGraph from '../components/Dashboard/SleepGraph';
 import FeedingGraph from '../components/Dashboard/FeedingGraph';
@@ -13,6 +14,7 @@ const DashboardPage = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState('week');
+    const { selectedFamily } = useAuth();
 
     const getDateRange = useCallback(() => {
         const now = new Date();
@@ -31,30 +33,40 @@ const DashboardPage = () => {
     }, [timeRange]);
 
     const fetchData = useCallback(async () => {
+        if (!selectedFamily) return;
+
         setLoading(true);
         const { start, end } = getDateRange();
         const q = query(
             collection(db, 'journalEntries'),
-            where('createdBy', '==', auth.currentUser.uid),
+            where('familyId', '==', selectedFamily.id),
             where('createdAt', '>=', start),
             where('createdAt', '<=', end)
         );
 
-        const querySnapshot = await getDocs(q);
-        const entries = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-
-        setData(entries);
-        setLoading(false);
-    }, [getDateRange]);
+        try {
+            const querySnapshot = await getDocs(q);
+            const entries = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setData(entries);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedFamily, getDateRange]);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        if (selectedFamily) {
+            fetchData();
+        }
+    }, [selectedFamily, fetchData]);
 
-    const validData = Array.isArray(data) ? data : [];
+    if (!selectedFamily) {
+        return <div className="text-center mt-8">Please select a family first.</div>;
+    }
 
     if (loading) {
         return <div className="text-center mt-8">Loading dashboard data...</div>;
@@ -62,7 +74,7 @@ const DashboardPage = () => {
 
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-bold text-center mb-8">Dashboard</h1>
+            <h1 className="text-3xl font-bold text-center mb-8">Dashboard for {selectedFamily.name}</h1>
 
             <div className="flex justify-center space-x-4 mb-8">
                 {['day', 'week', 'month', 'year'].map((range) => (
@@ -76,14 +88,14 @@ const DashboardPage = () => {
                 ))}
             </div>
 
-            <Summary data={validData} timeRange={timeRange} />
+            <Summary data={data} timeRange={timeRange} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <SleepGraph data={validData} timeRange={timeRange} />
-                <FeedingGraph data={validData} timeRange={timeRange} />
-                <DiaperGraph data={validData} timeRange={timeRange} />
-                <ActivityGraph data={validData} timeRange={timeRange} />
-                <GrowthGraph data={validData} timeRange={timeRange} />
+                <SleepGraph data={data} timeRange={timeRange} />
+                <FeedingGraph data={data} timeRange={timeRange} />
+                <DiaperGraph data={data} timeRange={timeRange} />
+                <ActivityGraph data={data} timeRange={timeRange} />
+                <GrowthGraph data={data} timeRange={timeRange} />
             </div>
         </div>
     );
