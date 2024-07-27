@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { useAuth } from './hooks/useAuth';
 import { FamilyProvider } from './contexts/FamilyContext';
+import { useAuth } from './hooks/useAuth';
 
 // Importing components
 import Header from './components/Layout/Header';
@@ -17,6 +17,7 @@ import SignUp from './components/Auth/SignUp';
 import UserProfile from './components/Profiles/UserProfile';
 import ChildrenList from './components/Profiles/ChildrenList';
 import ChildProfile from './components/Profiles/ChildProfile';
+import FamilySettingsPage from './pages/FamilySettingsPage'; // Import the new FamilySettingsPage component
 
 // PrivateRoute component
 const PrivateRoute = ({ children }) => {
@@ -65,7 +66,7 @@ function App() {
                   <Route path="/children/:familyId" element={<ChildrenList />} />
                   <Route path="/child/:childId" element={<ChildProfile />} />
                   <Route
-                    path="/journal"
+                    path="/journal/:familyId"
                     element={
                       <PrivateRoute>
                         <JournalPage />
@@ -73,7 +74,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/dashboard"
+                    path="/dashboard/:familyId"
                     element={
                       <PrivateRoute>
                         <DashboardPage />
@@ -85,6 +86,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         <FamilyPage />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/family-settings/:familyId"
+                    element={
+                      <PrivateRoute>
+                        <FamilySettingsPage />
                       </PrivateRoute>
                     }
                   />

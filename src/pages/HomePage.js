@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
+import { useFamilyContext } from '../contexts/FamilyContext';
 import Button from '../components/UI/Button';
 import Card from '../components/UI/Card';
 
 const HomePage = () => {
     const { user } = useAuth();
+    const { selectedFamily, setSelectedFamily } = useFamilyContext();
     const [families, setFamilies] = useState([]);
-    const [selectedFamily, setSelectedFamily] = useState(null);
     const [newFamilyName, setNewFamilyName] = useState('');
 
     const fetchFamilies = useCallback(async () => {
@@ -25,7 +26,7 @@ const HomePage = () => {
                 setSelectedFamily(null);
             }
         }
-    }, [user]);
+    }, [user, setSelectedFamily]);
 
     useEffect(() => {
         fetchFamilies();
@@ -43,6 +44,10 @@ const HomePage = () => {
             await fetchFamilies();
             setSelectedFamily({ id: docRef.id, name: newFamilyName });
         }
+    };
+
+    const handleFamilySelect = (family) => {
+        setSelectedFamily(family);
     };
 
     if (!user) {
@@ -82,7 +87,11 @@ const HomePage = () => {
                 <div>
                     <h2 className="text-2xl font-semibold mb-2">Your Families</h2>
                     {families.map(family => (
-                        <Card key={family.id} className="mb-2 p-4 cursor-pointer" onClick={() => setSelectedFamily(family)}>
+                        <Card
+                            key={family.id}
+                            className={`mb-2 p-4 cursor-pointer ${selectedFamily && selectedFamily.id === family.id ? 'bg-blue-100' : ''}`}
+                            onClick={() => handleFamilySelect(family)}
+                        >
                             <h3 className="text-xl font-semibold">{family.name}</h3>
                         </Card>
                     ))}
@@ -111,30 +120,25 @@ const HomePage = () => {
                                 <p>Manage children profiles</p>
                             </Card>
                         </Link>
+                        <Link to={`/journal/${selectedFamily.id}`}>
+                            <Card className="p-4">
+                                <h3 className="text-xl font-semibold">Journal</h3>
+                                <p>Record and view daily entries</p>
+                            </Card>
+                        </Link>
+                        <Link to={`/dashboard/${selectedFamily.id}`}>
+                            <Card className="p-4">
+                                <h3 className="text-xl font-semibold">Dashboard</h3>
+                                <p>View statistics and reports</p>
+                            </Card>
+                        </Link>
                         <Link to={`/family-settings/${selectedFamily.id}`}>
                             <Card className="p-4">
                                 <h3 className="text-xl font-semibold">Family Settings</h3>
                                 <p>Manage family members and settings</p>
                             </Card>
                         </Link>
-                        {families.length > 0 && (
-                            <>
-                                <Link to={`/journal/${selectedFamily.id}`}>
-                                    <Card className="p-4">
-                                        <h3 className="text-xl font-semibold">Journal</h3>
-                                        <p>Record and view daily entries</p>
-                                    </Card>
-                                </Link>
-                                <Link to={`/dashboard/${selectedFamily.id}`}>
-                                    <Card className="p-4">
-                                        <h3 className="text-xl font-semibold">Dashboard</h3>
-                                        <p>View statistics and reports</p>
-                                    </Card>
-                                </Link>
-                            </>
-                        )}
                     </div>
-                    <Button onClick={() => setSelectedFamily(null)} className="mt-4">Change Family</Button>
                 </div>
             )}
 

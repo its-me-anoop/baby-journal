@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { FamilyContext } from '../../contexts/FamilyContext';
+import { useFamilyContext } from '../../contexts/FamilyContext';
 import Button from '../UI/Button';
 
 const Header = () => {
     const { user, signOut } = useAuth();
-    const { selectedFamily } = useContext(FamilyContext);
+    const { selectedFamily } = useFamilyContext();
     const navigate = useNavigate();
 
     const handleSignOut = async () => {
