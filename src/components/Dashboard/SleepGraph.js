@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { format, parseISO, differenceInHours, isSameDay, isSameWeek, isSameMonth, isSameYear } from 'date-fns';
+import { format, parseISO, differenceInHours } from 'date-fns';
 
 const SleepGraph = ({ data, timeRange }) => {
     const sleepData = data

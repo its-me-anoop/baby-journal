@@ -102,6 +102,7 @@ const JournalForm = ({ onEntryAdded }) => {
                     <option value="feeding">Feeding</option>
                     <option value="diaper">Diaper</option>
                     <option value="activity">Activity</option>
+                    <option value="growth">Growth</option>
                 </select>
             </div>
 

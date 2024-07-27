@@ -1,77 +1,123 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { db, auth } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import Card, { CardHeader, CardContent } from '../components/UI/Card';
 import Button from '../components/UI/Button';
+import Card from '../components/UI/Card';
 
 const HomePage = () => {
     const { user } = useAuth();
+    const [families, setFamilies] = useState([]);
+    const [selectedFamily, setSelectedFamily] = useState(null);
+    const [newFamilyName, setNewFamilyName] = useState('');
+
+    useEffect(() => {
+        if (user) {
+            fetchFamilies();
+        }
+    }, [user]);
+
+    const fetchFamilies = async () => {
+        const q = query(
+            collection(db, 'families'),
+            where('members', 'array-contains', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        setFamilies(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    };
+
+    const createFamily = async () => {
+        if (newFamilyName.trim()) {
+            await addDoc(collection(db, 'families'), {
+                name: newFamilyName,
+                members: [user.uid],
+                createdBy: user.uid,
+                createdAt: new Date()
+            });
+            setNewFamilyName('');
+            fetchFamilies();
+        }
+    };
+
+    if (!user) {
+        return (
+            <div className="text-center">
+                <h1 className="text-3xl font-bold mb-4">Welcome to Baby Journal</h1>
+                <p className="mb-4">Please log in or sign up to get started.</p>
+                <Link to="/login" className="mr-4">
+                    <Button>Login</Button>
+                </Link>
+                <Link to="/signup">
+                    <Button>Sign Up</Button>
+                </Link>
+            </div>
+        );
+    }
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold text-center mb-8">Welcome to Baby Journal</h1>
+        <div>
+            <h1 className="text-3xl font-bold mb-4">Welcome, {user.displayName || user.email}</h1>
 
-            {user ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                        <CardHeader>Quick Actions</CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <Link to="/journal/new">
-                                    <Button variant="primary" className="w-full">Add Journal Entry</Button>
-                                </Link>
-                                <Link to="/dashboard">
-                                    <Button variant="secondary" className="w-full">View Dashboard</Button>
-                                </Link>
-                            </div>
-                        </CardContent>
-                    </Card>
+            {!selectedFamily && (
+                <div>
+                    <h2 className="text-2xl font-semibold mb-2">Your Families</h2>
+                    {families.map(family => (
+                        <Card key={family.id} className="mb-2 p-4 cursor-pointer" onClick={() => setSelectedFamily(family)}>
+                            <h3 className="text-xl font-semibold">{family.name}</h3>
+                        </Card>
+                    ))}
 
-                    <Card>
-                        <CardHeader>Recent Activity</CardHeader>
-                        <CardContent>
-                            {/* You can add a list of recent journal entries here */}
-                            <p>No recent activities to show.</p>
-                        </CardContent>
-                    </Card>
-                </div>
-            ) : (
-                <div className="text-center">
-                    <p className="mb-6 text-xl">Track your baby's growth, milestones, and daily activities with ease.</p>
-                    <div className="space-x-4">
-                        <Link to="/login">
-                            <Button variant="primary">Login</Button>
-                        </Link>
-                        <Link to="/signup">
-                            <Button variant="secondary">Sign Up</Button>
-                        </Link>
+                    <div className="mt-4">
+                        <h3 className="text-xl font-semibold mb-2">Create New Family</h3>
+                        <input
+                            type="text"
+                            value={newFamilyName}
+                            onChange={(e) => setNewFamilyName(e.target.value)}
+                            placeholder="Family Name"
+                            className="border p-2 mr-2"
+                        />
+                        <Button onClick={createFamily}>Create Family</Button>
                     </div>
                 </div>
             )}
 
-            <div className="mt-12">
-                <h2 className="text-2xl font-bold mb-4">Features</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card>
-                        <CardHeader>Journal Entries</CardHeader>
-                        <CardContent>
-                            Keep track of feedings, diaper changes, sleep patterns, and more.
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>Growth Tracking</CardHeader>
-                        <CardContent>
-                            Monitor your baby's weight, height, and other important metrics.
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>Milestone Recording</CardHeader>
-                        <CardContent>
-                            Never miss a moment. Record and celebrate your baby's achievements.
-                        </CardContent>
-                    </Card>
+            {selectedFamily && (
+                <div>
+                    <h2 className="text-2xl font-semibold mb-4">{selectedFamily.name}</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Link to={`/journal/${selectedFamily.id}`}>
+                            <Card className="p-4">
+                                <h3 className="text-xl font-semibold">Journal</h3>
+                                <p>Record and view daily entries</p>
+                            </Card>
+                        </Link>
+                        <Link to={`/children/${selectedFamily.id}`}>
+                            <Card className="p-4">
+                                <h3 className="text-xl font-semibold">Children</h3>
+                                <p>Manage children profiles</p>
+                            </Card>
+                        </Link>
+                        <Link to={`/dashboard/${selectedFamily.id}`}>
+                            <Card className="p-4">
+                                <h3 className="text-xl font-semibold">Dashboard</h3>
+                                <p>View statistics and reports</p>
+                            </Card>
+                        </Link>
+                        <Link to={`/family-settings/${selectedFamily.id}`}>
+                            <Card className="p-4">
+                                <h3 className="text-xl font-semibold">Family Settings</h3>
+                                <p>Manage family members and settings</p>
+                            </Card>
+                        </Link>
+                    </div>
+                    <Button onClick={() => setSelectedFamily(null)} className="mt-4">Change Family</Button>
                 </div>
-            </div>
+            )}
+
+            <Link to="/profile" className="block mt-8">
+                <Button>View Profile</Button>
+            </Link>
         </div>
     );
 };
