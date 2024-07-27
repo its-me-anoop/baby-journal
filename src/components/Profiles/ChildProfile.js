@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../services/firebase';
-import Button from '../components/UI/Button';
-import Input from '../components/UI/Input';
+import { db, storage } from '../../services/firebase';
+import Button from '../../components/UI/Button';
+import Input from '../../components/UI/Input';
 import CryptoJS from 'crypto-js';
 
 const ENCRYPTION_KEY = process.env.REACT_APP_ENCRYPTION_KEY; // Store this securely, not in the code
@@ -24,13 +24,7 @@ const ChildProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [photo, setPhoto] = useState(null);
 
-    useEffect(() => {
-        if (childId) {
-            fetchChildProfile();
-        }
-    }, [childId]);
-
-    const fetchChildProfile = async () => {
+    const fetchChildProfile = useCallback(async () => {
         const docRef = doc(db, 'children', childId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -41,7 +35,13 @@ const ChildProfile = () => {
                 medications: data.medications ? decrypt(data.medications) : '',
             });
         }
-    };
+    }, [childId]);
+
+    useEffect(() => {
+        if (childId) {
+            fetchChildProfile();
+        }
+    }, [childId, fetchChildProfile]);
 
     const handleUpdate = async () => {
         const docRef = doc(db, 'children', childId);

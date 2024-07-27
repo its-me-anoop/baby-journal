@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db, auth } from '../services/firebase';
-import { useAuth } from '../hooks/useAuth';
-import Button from '../components/UI/Button';
-import Input from '../components/UI/Input';
+import { db } from '../../services/firebase';
+import { useAuth } from '../../hooks/useAuth';
+import Button from '../UI/Button';
+import Input from '../UI/Input';
 
 const UserProfile = () => {
     const { user } = useAuth();
     const [profile, setProfile] = useState({});
     const [isEditing, setIsEditing] = useState(false);
 
-    useEffect(() => {
+    const fetchProfile = useCallback(async () => {
         if (user) {
-            fetchProfile();
+            const docRef = doc(db, 'users', user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                setProfile(docSnap.data());
+            }
         }
     }, [user]);
 
-    const fetchProfile = async () => {
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            setProfile(docSnap.data());
-        }
-    };
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
     const handleUpdate = async () => {
         const docRef = doc(db, 'users', user.uid);
