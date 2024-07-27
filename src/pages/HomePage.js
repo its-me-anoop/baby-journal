@@ -42,6 +42,11 @@ const HomePage = () => {
         }
     };
 
+    const handleFamilyChange = (e) => {
+        const family = families.find(f => f.id === e.target.value);
+        setSelectedFamily(family);
+    };
+
     if (!user) {
         return (
             <div className="text-center">
@@ -77,16 +82,17 @@ const HomePage = () => {
                 </div>
             ) : (
                 <div>
-                    <h2 className="text-2xl font-semibold mb-2">Your Families</h2>
-                    {families.map(family => (
-                        <Card
-                            key={family.id}
-                            className={`mb-2 p-4 cursor-pointer ${selectedFamily && selectedFamily.id === family.id ? 'bg-blue-100' : ''}`}
-                            onClick={() => setSelectedFamily(family)}
-                        >
-                            <h3 className="text-xl font-semibold">{family.name}</h3>
-                        </Card>
-                    ))}
+                    <h2 className="text-2xl font-semibold mb-2">Select a Family</h2>
+                    <select
+                        value={selectedFamily ? selectedFamily.id : ''}
+                        onChange={handleFamilyChange}
+                        className="w-full p-2 border rounded mb-4"
+                    >
+                        <option value="">Select a family</option>
+                        {families.map(family => (
+                            <option key={family.id} value={family.id}>{family.name}</option>
+                        ))}
+                    </select>
 
                     <div className="mt-4">
                         <h3 className="text-xl font-semibold mb-2">Create New Family</h3>
