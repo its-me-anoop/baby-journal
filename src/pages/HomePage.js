@@ -1,32 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import { useFamilyContext } from '../contexts/FamilyContext';
 import Button from '../components/UI/Button';
 import Card from '../components/UI/Card';
 
 const HomePage = () => {
-    const { user } = useAuth();
-    const { selectedFamily, setSelectedFamily } = useFamilyContext();
+    const { user, selectedFamily, setSelectedFamily } = useAuth();
     const [families, setFamilies] = useState([]);
     const [newFamilyName, setNewFamilyName] = useState('');
 
     const fetchFamilies = useCallback(async () => {
         if (user) {
-            const q = query(
-                collection(db, 'families'),
-                where('members', 'array-contains', user.uid)
-            );
+            const q = query(collection(db, 'families'), where('members', 'array-contains', user.uid));
             const querySnapshot = await getDocs(q);
             const fetchedFamilies = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setFamilies(fetchedFamilies);
-            if (fetchedFamilies.length === 0) {
-                setSelectedFamily(null);
+
+            if (fetchedFamilies.length > 0 && !selectedFamily) {
+                setSelectedFamily(fetchedFamilies[0]);
             }
         }
-    }, [user, setSelectedFamily]);
+    }, [user, selectedFamily, setSelectedFamily]);
 
     useEffect(() => {
         fetchFamilies();
@@ -44,10 +40,6 @@ const HomePage = () => {
             await fetchFamilies();
             setSelectedFamily({ id: docRef.id, name: newFamilyName });
         }
-    };
-
-    const handleFamilySelect = (family) => {
-        setSelectedFamily(family);
     };
 
     if (!user) {
@@ -90,7 +82,7 @@ const HomePage = () => {
                         <Card
                             key={family.id}
                             className={`mb-2 p-4 cursor-pointer ${selectedFamily && selectedFamily.id === family.id ? 'bg-blue-100' : ''}`}
-                            onClick={() => handleFamilySelect(family)}
+                            onClick={() => setSelectedFamily(family)}
                         >
                             <h3 className="text-xl font-semibold">{family.name}</h3>
                         </Card>
