@@ -25,8 +25,10 @@ const HomePage = () => {
     }, [user, selectedFamily, setSelectedFamily]);
 
     useEffect(() => {
+        console.log("HomePage - User:", user);
+        console.log("HomePage - Selected Family:", selectedFamily);
         fetchFamilies();
-    }, [fetchFamilies]);
+    }, [user, selectedFamily, fetchFamilies]);
 
     const createFamily = async () => {
         if (newFamilyName.trim()) {
@@ -45,6 +47,7 @@ const HomePage = () => {
     const handleFamilyChange = (e) => {
         const family = families.find(f => f.id === e.target.value);
         setSelectedFamily(family);
+        console.log("Family selected:", family);
     };
 
     if (!user) {

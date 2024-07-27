@@ -3,14 +3,15 @@ import { collection, query, where, orderBy, getDocs, addDoc } from 'firebase/fir
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../services/firebase';
 import { useAuth } from '../hooks/useAuth';
-import { useFamilyContext } from '../contexts/FamilyContext';
 import JournalEntry from '../components/Journal/JournalEntry';
 import Button from '../components/UI/Button';
 import Input from '../components/UI/Input';
 import { Link } from 'react-router-dom';
 
 const JournalPage = () => {
+    const { user, selectedFamily } = useAuth();
     const [entries, setEntries] = useState([]);
+    const [children, setChildren] = useState([]);
     const [newEntry, setNewEntry] = useState({
         type: 'activity',
         childId: '',
@@ -27,13 +28,11 @@ const JournalPage = () => {
         headCircumference: '',
     });
     const [photo, setPhoto] = useState(null);
-    const { user } = useAuth();
-    const { selectedFamily } = useFamilyContext();
-    const [children, setChildren] = useState([]);
 
     useEffect(() => {
-        console.log("Selected Family:", selectedFamily);  // Debugging log
-    }, [selectedFamily]);
+        console.log("JournalPage - User:", user);
+        console.log("JournalPage - Selected Family:", selectedFamily);
+    }, [user, selectedFamily]);
 
     const fetchEntries = useCallback(async () => {
         if (selectedFamily) {
