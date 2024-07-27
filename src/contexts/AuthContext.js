@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { auth, db } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -12,20 +12,17 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            console.log("Auth state changed. User:", user);
             if (user) {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     setUser({ uid: user.uid, ...userDoc.data() });
                 }
 
-                // Load selected family from localStorage
                 const storedFamilyId = localStorage.getItem('selectedFamilyId');
                 if (storedFamilyId) {
                     const familyDoc = await getDoc(doc(db, 'families', storedFamilyId));
                     if (familyDoc.exists()) {
                         setSelectedFamily({ id: familyDoc.id, ...familyDoc.data() });
-                        console.log("Loaded family from localStorage:", { id: familyDoc.id, ...familyDoc.data() });
                     } else {
                         localStorage.removeItem('selectedFamilyId');
                     }
@@ -41,15 +38,15 @@ export const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    const updateSelectedFamily = (family) => {
-        setSelectedFamily(family);
-        if (family) {
+    const updateSelectedFamily = useCallback((family) => {
+        if (family && (!selectedFamily || family.id !== selectedFamily.id)) {
+            setSelectedFamily(family);
             localStorage.setItem('selectedFamilyId', family.id);
-        } else {
+        } else if (!family) {
+            setSelectedFamily(null);
             localStorage.removeItem('selectedFamilyId');
         }
-        console.log("Selected family updated:", family);
-    };
+    }, [selectedFamily]);
 
     const value = {
         user,
