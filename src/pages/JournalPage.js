@@ -7,6 +7,7 @@ import { useFamilyContext } from '../contexts/FamilyContext';
 import JournalEntry from '../components/Journal/JournalEntry';
 import Button from '../components/UI/Button';
 import Input from '../components/UI/Input';
+import { Link } from 'react-router-dom';
 
 const JournalPage = () => {
     const [entries, setEntries] = useState([]);
@@ -30,6 +31,10 @@ const JournalPage = () => {
     const { selectedFamily } = useFamilyContext();
     const [children, setChildren] = useState([]);
 
+    useEffect(() => {
+        console.log("Selected Family:", selectedFamily);  // Debugging log
+    }, [selectedFamily]);
+
     const fetchEntries = useCallback(async () => {
         if (selectedFamily) {
             const q = query(
@@ -51,9 +56,11 @@ const JournalPage = () => {
     }, [selectedFamily]);
 
     useEffect(() => {
-        fetchEntries();
-        fetchChildren();
-    }, [fetchEntries, fetchChildren]);
+        if (selectedFamily) {
+            fetchEntries();
+            fetchChildren();
+        }
+    }, [fetchEntries, fetchChildren, selectedFamily]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -115,7 +122,13 @@ const JournalPage = () => {
     };
 
     if (!selectedFamily) {
-        return <div>Please select a family first.</div>;
+        return (
+            <div className="text-center mt-8">
+                <p className="mb-4">Please select a family first.</p>
+                <p className="mb-4">If you haven't created a family yet, you can do so from the home page.</p>
+                <Link to="/" className="text-blue-500 hover:underline">Go to Home Page</Link>
+            </div>
+        );
     }
 
     return (
